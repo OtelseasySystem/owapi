@@ -1244,6 +1244,48 @@ class QueryHandler {
             );
           $stmt->execute($datass);
           $insert_id  = $this->db->lastInsertId();
+          for($i=0;$i<$data['no_of_rooms'];$i++){
+              for($j=0;$j < ($data['adults'][$i]);$j++) {
+                  $insert = "INSERT INTO traveller_details (
+                    title,
+                    firstname,
+                    lastname,
+                    age,
+                    type,
+                    roomindex,
+                    bookingid                    
+                  ) VALUES (?,?,?,?,?,?,?)";
+                  $stmt = $this->db->prepare($insert);
+                  $travellers = array($data['Room'.($i+1).'AdultTitle'][$j],
+                                      $data['Room'.($i+1).'AdultFirstname'][$j],
+                                      $data['Room'.($i+1).'AdultLastname'][$j],
+                                      $data['Room'.($i+1).'AdultAge'][$j],
+                                      'adult',
+                                      $data['RoomIndex'][$i],
+                                      $insert_id);
+                  $stmt->execute($travellers);
+              }
+              for($j=0;$j<$data['child'][$i];$j++) {
+                  $insert = "INSERT INTO traveller_details (
+                    title,
+                    firstname,
+                    lastname,
+                    age,
+                    type,
+                    roomindex,
+                    bookingid                    
+                  ) VALUES (?,?,?,?,?,?,?)";
+                  $stmt = $this->db->prepare($insert);
+                  $travellers = array($data['Room'.($i+1).'ChildTitle'][$j],
+                                      $data['Room'.($i+1).'ChildFirstname'][$j],
+                                      $data['Room'.($i+1).'ChildLastname'][$j],
+                                      $data['Room'.($i+1).'ChildAge'][$j],
+                                      'child',
+                                      $data['RoomIndex'][$i],
+                                      $insert_id);
+                  $stmt->execute($travellers);
+              }
+            }
         // print_r($insert_id);
         // exit();
 
@@ -1790,6 +1832,48 @@ class QueryHandler {
 
          $insert_id = $this->TBOBookingConfirm($agent_id,$ClientReferenceNumber,$BookingId,$Bookingresponse['TripId'],$Bookingresponse['ConfirmationNo'],$Bookingresponse['BookingStatus'],$dd['@attributes']['HotelName'],$rooms[0]['RoomTypeName'],$data['check_in'],$data['check_out'],$tot,$tot_days,$data['no_of_rooms'],$data['hotelcode'],$PriceChange,$total_markup,$guestfname,$guestlname,$board);
          $return['ConfirmationNo'] = $Bookingresponse['ConfirmationNo'];
+          for($i=0;$i<$data['no_of_rooms'];$i++){
+              for($j=0;$j < ($data['adults'][$i]);$j++) {
+                  $insert = "INSERT INTO traveller_details (
+                    title,
+                    firstname,
+                    lastname,
+                    age,
+                    type,
+                    roomindex,
+                    bookingid                    
+                  ) VALUES (?,?,?,?,?,?,?)";
+                  $stmt = $this->db->prepare($insert);
+                  $travellers = array($data['Room'.($i+1).'AdultTitle'][$j],
+                                      $data['Room'.($i+1).'AdultFirstname'][$j],
+                                      $data['Room'.($i+1).'AdultLastname'][$j],
+                                      $data['Room'.($i+1).'AdultAge'][$j],
+                                      'adult',
+                                      $data['RoomIndex'][$i],
+                                      $insert_id);
+                  $stmt->execute($travellers);
+              }
+              for($j=0;$j<$data['child'][$i];$j++) {
+                  $insert = "INSERT INTO traveller_details (
+                    title,
+                    firstname,
+                    lastname,
+                    age,
+                    type,
+                    roomindex,
+                    bookingid                    
+                  ) VALUES (?,?,?,?,?,?,?)";
+                  $stmt = $this->db->prepare($insert);
+                  $travellers = array($data['Room'.($i+1).'ChildTitle'][$j],
+                                      $data['Room'.($i+1).'ChildFirstname'][$j],
+                                      $data['Room'.($i+1).'ChildLastname'][$j],
+                                      $data['Room'.($i+1).'ChildAge'][$j],
+                                      'child',
+                                      $data['RoomIndex'][$i],
+                                      $insert_id);
+                  $stmt->execute($travellers);
+              }
+            }
       } 
       return $return;
     }
