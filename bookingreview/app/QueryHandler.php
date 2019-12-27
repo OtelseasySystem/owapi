@@ -83,8 +83,12 @@ class QueryHandler {
         if(isset($data['token'])) {
           for($i=0;$i<$data['no_of_rooms'];$i++) {
               if(!isset($data['RoomIndex'][$i]) || $data['RoomIndex'][$i] == '') {
-
                   $return['RoomIndex['.$i.']'] = 'RoomIndex '.($i).' is required';
+              } else {
+                  $roomindex = explode('-',$data['RoomIndex'][$i]);
+                  if(!isset($roomindex[0]) || !isset($roomindex[1])) {
+                      $return['RoomIndex['.$i.'] format'] = 'RoomIndex '.($i).' is should be in the contractId - roomId format(eg:CON010-348)';
+                  }
               }
           }
         }
