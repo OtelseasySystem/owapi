@@ -78,7 +78,6 @@ return function (App $app) {
       	} else {
 
         $data1 = unserialize(base64_decode($data['token']));
-
         $data = array_merge($data1,$data);
         if (isset($data['sessionid'])) {
           $rooms = $query->xmlroomwisepaxdata($data,$input['id']);

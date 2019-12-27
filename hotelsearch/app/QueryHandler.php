@@ -38,23 +38,23 @@ class QueryHandler {
             $return['no_of_rooms'] = 'Number of rooms is mandatory';
         }
 
-        if (isset($data['check_in']) &&  $data['check_in'] < date('d-m-Y')) {
+        if (isset($data['check_in']) &&  date('d-m-Y',strtotime($data['check_in'])) < date('d-m-Y')) {
             $return['check_in_err'] = 'Check in date must be equal or greater than the current date ('.date('d-m-Y').')';
         }
         if (isset($data['check_out']) &&  $data['check_in'] >= $data['check_out']) {
             $return['check_out_err'] = 'Check out date must be  greater than the checkin date ('.$data['check_in'].')';
         }
         if (isset($data['check_in'])) {
-          if (preg_match("/^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-[0-9]{4}$/",$data['check_in'])) {
+          if (preg_match("/^([0-9]{2})-([0-9]{2})-([0-9]{4})$/",$data['check_in'])) {
           } else {
             $return['check_in_err'] = 'Invalid Check in date';
           }
         }
 
         if (isset($data['check_out'])) {
-          if (preg_match("/^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-[0-9]{4}$/",$data['check_out'])) {
+          if (preg_match("/^([0-9]{2})-([0-9]{2})-([0-9]{4})$/",$data['check_out'])) {
           } else {
-            $return['check_out_err'] = 'Invalid Check in date';
+            $return['check_out_err'] = 'Invalid Check out date';
           }
         }
 
