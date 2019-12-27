@@ -93,6 +93,7 @@ return function (App $app) {
             // print_r($e);
           }
 
+<<<<<<< HEAD
           if (is_array($data1)) {
             $data = array_merge($data1,$data);
           } else {
@@ -100,6 +101,10 @@ return function (App $app) {
             exit();
           }
 
+=======
+        $data1 = unserialize(base64_decode($data['token']));
+        $data = array_merge($data1,$data);
+>>>>>>> 6c1c0bc2e8185330369cc8736cf2faf0f5c3e63e
         if (isset($data['sessionid'])) {
           $rooms = $query->xmlroomwisepaxdata($data,$input['id']);
           if (count($rooms)!=0) {
