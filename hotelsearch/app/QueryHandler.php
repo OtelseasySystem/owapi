@@ -38,10 +38,10 @@ class QueryHandler {
             $return['no_of_rooms'] = 'Number of rooms is mandatory';
         }
 
-        if (isset($data['check_in']) &&  date('d-m-Y',strtotime($data['check_in'])) < date('d-m-Y')) {
+        if (isset($data['check_in']) &&  date('Y-m-d',strtotime($data['check_in'])) < date('Y-m-d')) {
             $return['check_in_err'] = 'Check in date must be equal or greater than the current date ('.date('d-m-Y').')';
         }
-        if (isset($data['check_out']) &&  $data['check_in'] >= $data['check_out']) {
+        if (isset($data['check_in']) && isset($data['check_out']) &&  date('Y-m-d',strtotime($data['check_in'])) >= date('Y-m-d',strtotime($data['check_out']))) {
             $return['check_out_err'] = 'Check out date must be  greater than the checkin date ('.$data['check_in'].')';
         }
         if (isset($data['check_in'])) {
