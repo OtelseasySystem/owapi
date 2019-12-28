@@ -124,7 +124,8 @@ class QueryHandler {
       IF(generalsub!=0,IF(StayGeneral=1, generalsub,generalsub-(generalsub*generaldis/100)),0) as generalsubAmount
 
       FROM (select con.board,CONCAT(f.room_name,' ',g.Room_Type) as RoomName, f.room_facilities,
-      concat('".$imgurl."uploads/rooms/',a.room_id,'/',f.images) as ImageUrl,a.hotel_id,a.contract_id,a.room_id,
+      IF(f.images!='',
+      concat('".$imgurl."uploads/rooms/',a.room_id,'/',f.images),'') as ImageUrl,a.hotel_id,a.contract_id,a.room_id,
       if(con.contract_type='Sub',(select GetAllotmentCount1(a.allotement_date,a.hotel_id,CONCAT('CON0',linkedcontract),a.room_id ,'".date('Y-m-d')."',".$tot_days.",".count($data['adults']).")),(select GetAllotmentCount1(a.allotement_date,a.hotel_id,a.contract_id,a.room_id ,'".date('Y-m-d')."',".$tot_days.",".count($data['adults'])."))) as allotment, a.amount as TtlPrice1,dis.discount_type,dis.Extrabed as StayExbed,dis.General as StayGeneral,dis.Board as StayBoard,IF(dis.stay_night!='',(dis.pay_night*ceil(".$tot_days."/dis.stay_night))+(".$tot_days."-(dis.stay_night*ceil(".$tot_days."/dis.stay_night))),0) as fday ,CONCAT(con.contract_id,'-',a.room_id) as RoomIndex, rev.ExtrabedMarkup,rev.ExtrabedMarkuptype,f.standard_capacity,con.max_child_age,
 
         ((a.amount+(a.amount*".$markup."/100)+IF(rev.Markup!='',IF(rev.Markuptype='Percentage',(a.amount*rev.Markup/100),(rev.Markup)), (a.amount*".$general_markup."/100)))
