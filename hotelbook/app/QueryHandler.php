@@ -1286,7 +1286,7 @@ class QueryHandler {
                                       $data['Room'.($i+1).'ChildLastname'][$j],
                                       $data['Room'.($i+1).'ChildAge'][$j],
                                       'child',
-                                      $data['RoomIndex'][$i],
+                                      $i+1,
                                       $insert_id);
                   $stmt->execute($travellers);
               }
