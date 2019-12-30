@@ -53,7 +53,9 @@ class QueryHandler {
           $stmt3->execute();
           $board = $stmt3->fetchAll();
 
-          
+          $stmt4 = $this->db->prepare("select roomindex from traveller_details where bookingid = ".$query[0]['id']." group by roomindex");
+          $stmt4->execute();
+          $rooms = $stmt4->fetchAll();
 
           $return['HotelName'] = $query[0]['hotel_name'];
           $return['Rating'] = $query[0]['rating'];
@@ -89,18 +91,21 @@ class QueryHandler {
           // $return['Currency'] =  'AED';
           $adultsexp = explode(",", $query[0]['Rwadults']);
           $childexp = explode(",", $query[0]['Rwchild']);
-          // Traveller details 
+          // Traveller details
           foreach ($adultsexp as $key => $value) {
               $return['TravellerDetails']['Room'.($key+1)]['AdultCount'] = $value;
               $return['TravellerDetails']['Room'.($key+1)]['ChildCount'] = $childexp[$key];
-
-              $RoomFname = "Room".($key+1)."FName";
-              $RoomLname = "Room".($key+1)."LName";
-
-              $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key]['Title'] =  '';
-              $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key]['Name'] = $query[0][$RoomFname]." ".(isset($query[0][$RoomLname]) ? $query[0][$RoomLname] : '');
-              $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key]['Age'] = '';
-
+          } 
+          foreach ($rooms as $key => $value) {
+              $roomindex = $value['roomindex'];
+              $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$roomindex."'");
+              $stmt5->execute();
+              $traveller_details = $stmt5->fetchAll();
+              foreach ($traveller_details as $key1 => $value1) {
+                $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Title'] =  $value1['title'];
+                $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Name'] = $value1['firstname']." ".$value1['lastname'];
+                 $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Age'] = $value1['age'];
+              }
           }
           // Traveller details 
          // print_r($return);
