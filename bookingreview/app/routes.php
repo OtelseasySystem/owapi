@@ -103,17 +103,24 @@ return function (App $app) {
               return $response
                 ->withHeader('Content-Type', 'application/json');
             } else {
-              	$rooms = $query->bookingreview($data,$input['id']);
-              	if (count($rooms)!=0) {
-              		$data1 = array('status' => true, 'message' => 'Successfull');
-              		$data1['details'] = $rooms;
-                  $tracking['Type'] = 'End';
+                $check = $query->checkContract($data,$input['id']);
+                if(count($check)!=0) {
+                  $rooms = $query->bookingreview($data,$input['id']);
+                  if (count($rooms)!=0) {
+                    $data1 = array('status' => true, 'message' => 'Successfull');
+                    $data1['details'] = $rooms;
+                    $tracking['Type'] = 'End';
+                    $trackingType = 'INFO';
+                  } else {
+                    $tracking['Type'] = 'EmptyData';
+                    $trackingType = 'INFO';
+                    $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'No Records');
+                  }
+                } else {
+                  $tracking['Type'] = 'Invalid Data';
                   $trackingType = 'INFO';
-              	} else {
-                  $tracking['Type'] = 'EmptyData';
-                  $trackingType = 'INFO';
-    				      $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'No Records');
-              	}
+                  $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'Invald room combination');
+                }
               	$response->getBody()->write(json_encode($data1));
         		    return $response
                   ->withHeader('Content-Type', 'application/json');

@@ -537,7 +537,6 @@ class QueryHandler {
       $stmt= $this->db->prepare("SELECT id FROM hotel_tbl_contract WHERE contract_id = '".$contract_id."' AND nonRefundable = 1");
       $stmt->execute();
       $refund = $stmt->fetchAll();
-
       $checkin_date=date_create($request['check_in']);
       $checkout_date=date_create($request['check_out']);
       $no_of_days=date_diff($checkin_date,$checkout_date);
@@ -622,9 +621,7 @@ class QueryHandler {
             $data[0]['ChargeType'] = "Percentage";
             $data[0]['CancellationCharge'] = "100";
         }
-
       }
-
       return $data;
     }
     public function DateWisediscountNonRefundable($date,$hotel_id,$room_id,$contract_id,$type,$checkIn,$checkOut) {
@@ -711,7 +708,6 @@ class QueryHandler {
         $stmt = $this->db->prepare("SELECT tax_percentage,max_child_age,board FROM hotel_tbl_contract WHERE hotel_id= '".$hotel_id."' and contract_id = '".$contract_id."'");
         $stmt->execute();  
         $row_values = $stmt->fetchAll();
-
         $tax = $row_values[0]['tax_percentage'];
         $max_child_age = $row_values[0]['max_child_age'];
         $contract_board = $row_values[0]['board'];
@@ -872,7 +868,6 @@ class QueryHandler {
         $stmt = $this->db->prepare("SELECT occupancy,occupancy_child,standard_capacity FROM hotel_tbl_hotel_room_type WHERE hotel_id = '".$hotel_id."' AND id = '".$room_id."'");
         $stmt->execute();  
         $Rmrow_values = $stmt->fetchAll();
-        
         $occupancyAdult = $Rmrow_values[0]['occupancy'];
         $occupancyChild = $Rmrow_values[0]['occupancy_child'];
         $standard_capacity = $Rmrow_values[0]['standard_capacity'];
@@ -969,7 +964,7 @@ class QueryHandler {
             $return['mangeneral'][$i] = array_unique($MangeneralsupplementType);
         }
         $return['gnlCount'] = array_sum($gsarraySum)+array_sum($mangsarraySum);
-        return $return;
+        return $return;       
     }
     public function xmlbookingreview($data,$agent_id) {
       $agent_markup = $this->mark_up_get($agent_id);
@@ -1453,5 +1448,19 @@ class QueryHandler {
       $return['BoardSupMarkuptype'] = '';
     }
     return $return;
+  }
+  public function checkContract($data) {
+    for ($i=0; $i < $data['no_of_rooms']; $i++) { 
+        $roomindex = explode('-',$data['RoomIndex'][$i]);
+        if(isset($roomindex[0])) {
+          $contractid[$i] = $roomindex[0];
+        } else {
+           $contractid[$i] = "";
+        }
+        $stmt = $this->db->prepare("SELECT * FROM hotel_tbl_contract where contract_id = '".$contractid[$i]."'");
+        $stmt->execute();
+        $final = $stmt->fetchAll();
+        return $final;
+    }
   }
 }
