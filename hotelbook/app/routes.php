@@ -73,7 +73,21 @@ return function (App $app) {
       		$response->getBody()->write(json_encode($hotelbookvalidation));
       		return $response;
       	} else {
-          $data1 = unserialize(base64_decode($data['token']));
+          try {
+            $data1 = @unserialize(base64_decode($data['token']));
+            if ($data1 == false) {
+              $validation['status'] = false;
+              $validation['message'] = 'Invalid token';
+              $validation['errorID'] = $GUID;
+              $tracking['Type'] = 'Invalid Token';
+              $trackingType = 'Error';
+              return $response
+               ->withHeader('Content-Type', 'application/json');
+            } else {
+            }
+          } catch(Exception $e) {
+            // print_r($e);
+          }
           $data2 = array_merge($data,$data1);
           $hotelbookvalidation = $query->validateparametershotelbook1($data2);
           if($hotelbookvalidation['status']!='true') {
@@ -98,16 +112,23 @@ return function (App $app) {
               $response->getBody()->write(json_encode($data1));
               return $response;
             } else {
-              $review = $query->hotelbookingfun($data2,$input['id']);
-              if (count($review)!=0) {
-                $tracking['Type'] = 'End';
-                $trackingType = 'INFO';
-                $data1 = array('status' => true, 'message' => 'Successfull');
-                $data1['ConfirmationNo'] = $review['ConfirmationNo'];
+              $check = $query->checkContract($data2);
+              if(count($check)!=0) {
+                $review = $query->hotelbookingfun($data2,$input['id']);
+                if (count($review)!=0) {
+                  $tracking['Type'] = 'End';
+                  $trackingType = 'INFO';
+                  $data1 = array('status' => true, 'message' => 'Successfull');
+                  $data1['ConfirmationNo'] = $review['ConfirmationNo'];
+                } else {
+                  $tracking['Type'] = 'BOOKINGFAILED';
+                  $trackingType = 'ERROR';
+                  $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'Booking Failed');
+                }
               } else {
-                $tracking['Type'] = 'BOOKINGFAILED';
-                $trackingType = 'ERROR';
-                $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'Booking Failed');
+                  $tracking['Type'] = 'Invalid Data';
+                  $trackingType = 'INFO';
+                  $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'Invalid room combination');
               }
               $response->getBody()->write(json_encode($data1));
               return $response;

@@ -1457,7 +1457,12 @@ class QueryHandler {
         } else {
            $contractid[$i] = "";
         }
-        $stmt = $this->db->prepare("SELECT * FROM hotel_tbl_contract where contract_id = '".$contractid[$i]."'");
+        if(isset($roomindex[1])) {
+          $roomid[$i] = $roomindex[1];
+        } else {
+           $roomid[$i] = "";
+        }
+        $stmt = $this->db->prepare("SELECT * FROM hotel_tbl_contract a join hotel_tbl_hotel_room_type b on a.hotel_id=b.hotel_id where a.contract_id = '".$contractid[$i]."' and b.id=".$roomid[$i]." and a.hotel_id =".$data['hotelcode']." and b.hotel_id=".$data['hotelcode']."");
         $stmt->execute();
         $final = $stmt->fetchAll();
         return $final;

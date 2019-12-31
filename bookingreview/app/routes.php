@@ -75,7 +75,21 @@ return function (App $app) {
       		return $response
             ->withHeader('Content-Type', 'application/json');
       	} else {
-          $data1 = unserialize(base64_decode($data['token']));
+          try {
+            $data1 = @unserialize(base64_decode($data['token']));
+            if ($data1 == false) {
+              $validation['status'] = false;
+              $validation['message'] = 'Invalid token';
+              $validation['errorID'] = $GUID;
+              $tracking['Type'] = 'Invalid Token';
+              $trackingType = 'Error';
+              return $response
+               ->withHeader('Content-Type', 'application/json');
+            } else {
+            }
+          } catch(Exception $e) {
+            // print_r($e);
+          }
           $data = array_merge($data1,$data);
 
           $BookingReviewvalidation = $query->validateRoomParameter($data);
@@ -103,7 +117,7 @@ return function (App $app) {
               return $response
                 ->withHeader('Content-Type', 'application/json');
             } else {
-                $check = $query->checkContract($data,$input['id']);
+                $check = $query->checkContract($data);
                 if(count($check)!=0) {
                   $rooms = $query->bookingreview($data,$input['id']);
                   if (count($rooms)!=0) {
