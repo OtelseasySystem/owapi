@@ -98,7 +98,7 @@ class QueryHandler {
           } 
           foreach ($rooms as $key => $value) {
               $roomindex = $value['roomindex'];
-              $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$roomindex."'");
+              $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$roomindex."' and bookingid = ".$query[0]['id']."");
               $stmt5->execute();
               $traveller_details = $stmt5->fetchAll();
               foreach ($traveller_details as $key1 => $value1) {
