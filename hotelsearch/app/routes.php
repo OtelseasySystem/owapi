@@ -77,7 +77,6 @@ return function (App $app) {
     			$checkout_date=date_create($data['check_out']);
     			$no_of_days=date_diff($checkin_date,$checkout_date);
     			$list = $query->getHotelList($data,$input['id']);
-                print_r($list);exit;
     			if (count($list)!=0) {
                     $tracking['Type'] = 'End';
                     $trackingType = 'INFO';
