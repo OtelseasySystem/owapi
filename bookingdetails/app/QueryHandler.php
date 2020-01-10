@@ -92,7 +92,7 @@ class QueryHandler {
               $return['TravellerDetails']['Room'.($key+1)]['AdultCount'] = $value;
               $return['TravellerDetails']['Room'.($key+1)]['ChildCount'] = $childexp[$key];
           } 
-          for ($w=1; $w <=$view[0]->book_room_count; $w++) {
+          for ($w=1; $w <=$query[0]['book_room_count']; $w++) {
               $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$w."' and bookingid = ".$query[0]['id']." and hotelType='oe'");
               $stmt5->execute();
               $traveller_details = $stmt5->fetchAll();
