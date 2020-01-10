@@ -97,9 +97,9 @@ class QueryHandler {
               $stmt5->execute();
               $traveller_details = $stmt5->fetchAll();
               foreach ($traveller_details as $key1 => $value1) {
-                $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Title'] =  $value1['title'];
-                $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Name'] = $value1['firstname']." ".$value1['lastname'];
-                 $return['TravellerDetails']['Room'.($key+1)]['Guest'][$key1+1]['Age'] = $value1['age'];
+                $return['TravellerDetails']['Room'.($w)]['Guest'][$key1+1]['Title'] =  $value1['title'];
+                $return['TravellerDetails']['Room'.($w)]['Guest'][$key1+1]['Name'] = $value1['firstname']." ".$value1['lastname'];
+                 $return['TravellerDetails']['Room'.($w)]['Guest'][$key1+1]['Age'] = $value1['age'];
               }
           }
           // Traveller details 
