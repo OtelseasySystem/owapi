@@ -53,10 +53,6 @@ class QueryHandler {
           $stmt3->execute();
           $board = $stmt3->fetchAll();
 
-          $stmt4 = $this->db->prepare("select roomindex from traveller_details where bookingid = ".$query[0]['id']." group by roomindex");
-          $stmt4->execute();
-          $rooms = $stmt4->fetchAll();
-
           $return['HotelName'] = $query[0]['hotel_name'];
           $return['Rating'] = $query[0]['rating'];
           $return['Address'] = $query[0]['location'];
@@ -96,9 +92,8 @@ class QueryHandler {
               $return['TravellerDetails']['Room'.($key+1)]['AdultCount'] = $value;
               $return['TravellerDetails']['Room'.($key+1)]['ChildCount'] = $childexp[$key];
           } 
-          foreach ($rooms as $key => $value) {
-              $roomindex = $value['roomindex'];
-              $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$roomindex."' and bookingid = ".$query[0]['id']."");
+          for ($w=1; $w <=$view[0]->book_room_count; $w++) {
+              $stmt5 = $this->db->prepare("select * from traveller_details where roomindex = '".$w."' and bookingid = ".$query[0]['id']." and hotelType='oe'");
               $stmt5->execute();
               $traveller_details = $stmt5->fetchAll();
               foreach ($traveller_details as $key1 => $value1) {
