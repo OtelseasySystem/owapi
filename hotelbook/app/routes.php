@@ -115,11 +115,15 @@ return function (App $app) {
               $check = $query->checkContract($data2);
               if(count($check)!=0) {
                 $review = $query->hotelbookingfun($data2,$input['id']);
-                if (count($review)!=0) {
+                if (isset($review['ConfirmationNo'])) {
                   $tracking['Type'] = 'End';
                   $trackingType = 'INFO';
                   $data1 = array('status' => true, 'message' => 'Successfull');
                   $data1['ConfirmationNo'] = $review['ConfirmationNo'];
+                } else if(isset($review['error'])) {
+                  $tracking['Type'] = 'BOOKINGFAILED';
+                  $trackingType = 'ERROR';
+                  $data1 = array('status'=>false,'errorID' => $GUID, 'message' => 'Booking Failed, no sufficient deposit amount.');
                 } else {
                   $tracking['Type'] = 'BOOKINGFAILED';
                   $trackingType = 'ERROR';

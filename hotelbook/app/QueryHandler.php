@@ -717,32 +717,34 @@ class QueryHandler {
     }
     public function hotelbookingfun($data,$agent_id) {
       $return = array();
+      $deposit = $this->agentdeposit($agent_id);
       $review = $this->bookingreview($data);
-        // Get Max booking Id start 
-        $max_id = $this->max_booking_id();
-        // Get Max booking Id end 
+      // Get Max booking Id start 
+      $max_id = $this->max_booking_id();
+      // Get Max booking Id end 
 
-        // Get Markup start
-        $agent_markup = $this->mark_up_get($agent_id);
-        $agent_general_markup = $this->general_mark_up_get($agent_id);
-        
-        // Get markup end
+      // Get Markup start
+      $agent_markup = $this->mark_up_get($agent_id);
+      $agent_general_markup = $this->general_mark_up_get($agent_id);
+      
+      // Get markup end
 
-        // Roomwise data finding start
-        $booking_flag = 2;
-        $BookingDate = date('Y-m-d');
-        $checkin_date=date_create($data['check_in']);
-        $checkout_date=date_create($data['check_out']);
-        $no_of_days=date_diff($checkin_date,$checkout_date);
-        $tot_days = $no_of_days->format("%a");
-        // Default variable declaration
-
-        for ($i=0; $i < $data['no_of_rooms'] ; $i++) { 
-          foreach ($review['room'.($i+1)] as $key => $value) {
-            $data['Room'.($i+1).'per_day_amount'][$key] = $value['amount'];
-          }
+      // Roomwise data finding start
+      $booking_flag = 2;
+      $BookingDate = date('Y-m-d');
+      $checkin_date=date_create($data['check_in']);
+      $checkout_date=date_create($data['check_out']);
+      $no_of_days=date_diff($checkin_date,$checkout_date);
+      $tot_days = $no_of_days->format("%a");
+      // Default variable declaration
+      $total =0;
+      for ($i=0; $i < $data['no_of_rooms'] ; $i++) { 
+        foreach ($review['room'.($i+1)] as $key => $value) {
+          $data['Room'.($i+1).'per_day_amount'][$key] = $value['amount'];
+          $total += $data['Room'.($i+1).'per_day_amount'][$key];
         }
-
+      }
+      if($deposit>=$total) {
         for ($x=0; $x < 6; $x++) { 
           if (!isset($data['Room'.($x+1).'per_day_amount'])) {
             $data['Room'.($x+1).'per_day_amount'] = array();
@@ -776,8 +778,6 @@ class QueryHandler {
         // $booking_flag = 2;
 
         for ($i=0; $i < count($data['adults']); $i++) { 
-          
-
           $arrRoomIndex = explode("-", $data['RoomIndex'][$i]);
           $RoomID[$i] = $arrRoomIndex[1]; 
           $ContractID[$i] = $arrRoomIndex[0]; 
@@ -1251,6 +1251,9 @@ class QueryHandler {
             );
           $stmt->execute($datass);
           $insert_id  = $this->db->lastInsertId();
+          $bal = $deposit - $total;
+          $update = $this->db->prepare("update hotel_tbl_agents set deposit_amount = ".$bal." where id =".$agent_id."");                        
+          $update->execute();
           for($i=0;$i<$data['no_of_rooms'];$i++){
               for($j=0;$j < ($data['adults'][$i]);$j++) {
                   $insert = "INSERT INTO traveller_details (
@@ -1396,8 +1399,10 @@ class QueryHandler {
           // General Supplement details Add end
 
         }
-      $return['ConfirmationNo'] = $max_id;
-
+        $return['ConfirmationNo'] = $max_id;
+      } else {
+        $return['error'] = 'error';
+      }       
       return $return;
     }
     public function revenue_markup1($hotel_id,$contract_id,$agent_id,$checkIn,$checkOut) {  
@@ -2272,5 +2277,11 @@ class QueryHandler {
         $final = $stmt->fetchAll();
         return $final;
     }
+  }
+  public function agentdeposit($agent_id) {  
+    $stmt1 = $this->db->prepare("SELECT deposit_amount FROM hotel_tbl_agents WHERE id = ".$agent_id."");
+    $stmt1->execute();
+    $query = $stmt1->fetchAll();
+    return $query[0]['deposit_amount'];
   }
 }
