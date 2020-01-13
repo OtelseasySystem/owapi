@@ -126,7 +126,10 @@ class QueryHandler {
         }
         return $return;
     }
-    public function bookingreview($data) {
+    public function bookingreview($data,$agent_id) {
+      $agent_markup = $this->mark_up_get($agent_id);
+      $general_markup = $this->general_mark_up_get($agent_id);
+
       $return = array();
       $response = array();
 
@@ -139,6 +142,13 @@ class QueryHandler {
         $result[1+$i]['day'] = date('l', strtotime($data['check_in']. ' + '.$i.' days'));
         $result[1+$i]['date'] = date('m/d/Y', strtotime($data['check_in']. ' + '.$i.'  days'));
       }  
+      $response['Checkin']= $data['check_in'];
+      $response['Checkout']= $data['check_out'];
+      $response['Adults']= $data['adults'];
+      $response['Child']= $data['child'];
+      $response['no_of_rooms']= $data['no_of_rooms'];
+      $response['no_of_days']=  $tot_days;
+      $response['Available']=  true;
       for ($i=0; $i < $data['no_of_rooms']; $i++) { 
         $roomindex = explode('-',$data['RoomIndex'][$i]);
         if(isset($roomindex[1])) {
@@ -152,17 +162,242 @@ class QueryHandler {
            $contractid[$i] = "";
         }
         $contractBoardCheck = $this->contractBoardCheck($contractid[$i]);
+
+        
+        $extrabed = $this->get_PaymentConfirmextrabedAllotment($data,$data['hotelcode'],$contractid[$i],$roomid[$i],$i); 
+        $general = $this->get_Confirmgeneral_supplement($data,$contractid[$i],$roomid[$i],$i+1,$data['hotelcode']); 
+
+        $Fdays = 0;
+        $discountGet = $this->Alldiscount(date('Y-m-d',strtotime($data['check_in'])),date('Y-m-d',strtotime($data['check_out'])),$data['hotelcode'],$roomid[$i],$contractid[$i],'Room'); 
+        if ($discountGet['dis']=="true") {
+          $Cdays = $tot_days/$discountGet['stay'];
+          $parts = explode('.', $Cdays);
+          $Cdays = $parts[0];
+          $Sdays = $discountGet['stay']*$Cdays;
+          $Pdays = $discountGet['pay']*$Cdays;
+          $Tdays = $tot_days-$Sdays;
+          $Fdays = $Pdays+$Tdays;
+          $discountGet['stay'];
+          $discountGet['pay'];
+        }
+        if($discountGet['dis']=="true") { 
+          $data['discount']['Stay'] =  $discountGet['stay'].'nights';
+          $data['discount']['Pay'] = $discountGet['pay'].'nights';
+        }
+
+        $x= 0;
         for ($j=1; $j <=$tot_days ; $j++) {
+          $revenue_markup = $this->revenue_markup2($data['hotelcode'],$contractid[$i],$agent_id,date('Y-m-d' ,strtotime($result[$j]['date'])));
+
           $result[$j]['amount'] = $this->special_offer_amount($result[$j]['date'],$roomid[$i],$data['hotelcode'],$contractid[$i]);
           $result[$j]['roomName'] = $this->roomnameGET($roomid[$i],$data['hotelcode']);
-          $return[$j]['date']= date('d/m/Y' ,strtotime($result[$j]['date']));
-          $return[$j]['room'] = $result[$j]['roomName'];
-          $return[$j]['boardname'] = $contractBoardCheck[0]['board'];
-          $return[$j]['amount'] = $result[$j]['amount'];
+          $FextrabedAmount[$j-1]  = 0;
+          $TFextrabedAmount[$j-1]  = 0;
+          $GAamount[$j-1] = 0;
+          $GCamount[$j-1] = 0;
+          $BBAamount[$j-1] = 0;
+          $BBCamount[$j-1] = 0;
+          $LAamount[$j-1] = 0;
+          $LCamount[$j-1] = 0;
+          $DAamount[$j-1] = 0;
+          $DCamount[$j-1] = 0;
+          $TGAamount[$j-1] = 0;
+          $TGCamount[$j-1] = 0;
 
+          $RMdiscount = $this->DateWisediscount(date('Y-m-d' ,strtotime($result[$j]['date'])),$data['hotelcode'],$roomid[$i],$contractid[$i],'Room',date('Y-m-d',strtotime($data['check_in'])),date('Y-m-d',strtotime($data['check_out'])),$discountGet['dis']);
+          $RMdiscountval[$i] = $RMdiscount['discount'];
+          $GDis = 0;
+          if ($RMdiscount['discount']!=0 && $RMdiscount['General']!=0) { 
+            $GDis = $RMdiscount['discount'];
           }
-          $response['room'.($i+1)] =$return; 
+          $exDis = 0;
+          if ($RMdiscount['discount']!=0 && $RMdiscount['Extrabed']!=0) { 
+            $exDis = $RMdiscount['discount'];
+          }
+          $BDis = 0;
+          if ($RMdiscount['discount']!=0 && $RMdiscount['Board']!=0) { 
+            $BDis = $RMdiscount['discount'];
+          }
+
+
+
+          $return['amount_breakup'][$x]['Date']= date('d/m/Y' ,strtotime($result[$j]['date']));
+          $return['amount_breakup'][$x]['RoomName'] = $result[$j]['roomName'];
+          $return['amount_breakup'][$x]['Board'] = $contractBoardCheck[0]['board'];
+          $rmamount = 0;
+          $total_markup = $agent_markup+$general_markup;
+          if ($revenue_markup['Markup']!='') {
+              $total_markup = $agent_markup;
+            if ($revenue_markup['Markuptype']=="Percentage") {
+              $rmamount = (($result[$j]['amount']*$revenue_markup['Markup'])/100);
+            } else {
+              $rmamount = $revenue_markup['Markup'];
+            }
+          }
+
+          $roomAmount[$j]  = (($result[$j]['amount']*$total_markup)/100)+$result[$j]['amount']+$rmamount;
+          $DisroomAmount[$j] = $roomAmount[$j]-($roomAmount[$j]*$RMdiscount['discount'])/100;
+          $WiDisroomAmount[$j] = $roomAmount[$j];
+
+          if ($RMdiscount['discount']!=0) { 
+            // $return['amount_breakup'][$x]['roomamount'] = $roomAmount[$j];
+          }
+          $return['amount_breakup'][$x]['Price'] = $DisroomAmount[$j];
+
+          // General Supplement breakup start 
+          if($general['gnlCount']!=0) {
+            //General Supplement adult breakup start
+            foreach ($general['date'] as $GAkey => $GAvalue) {
+              if ($GAvalue==date('d/m/Y' ,strtotime($result[$j]['date']))) {
+                foreach ($general['general'][$GAkey] as $GSNkey => $GSNvalue) {
+                  if (isset($general['RWadultamount'][$GAkey][$GSNvalue])) {
+                    $x++;
+                    $GSAmamount = 0;
+                    if ($revenue_markup['GeneralSupMarkup']!='') {
+                        $total_markup = $agent_markup;
+                      if ($revenue_markup['GeneralSupMarkuptype']=="Percentage") {
+                        $GSAmamount = (($general['RWadultamount'][$GAkey][$GSNvalue][$i+1]*$revenue_markup['GeneralSupMarkup'])/100);
+                      } else {
+                        $GSAmamount = $revenue_markup['GeneralSupMarkup'];
+                      }
+                    }
+                    $GAamount[$j-1] = ($general['RWadultamount'][$GAkey][$GSNvalue][$i+1]*$total_markup)/100+$general['RWadultamount'][$GAkey][$GSNvalue][$i+1]+$GSAmamount;
+                    $TGAamount[$j-1] += $GAamount[$j-1]-($GAamount[$j-1]*$GDis)/100;
+                    if ($RMdiscount['discount']!=0 && $RMdiscount['General']!=0) { 
+                      // $return['generalSupplement']['adult'.$GAkey]['old-price'][]=$GAamount[$j-1];
+                    }
+                    $return['amount_breakup'][$x]['Date']= date('d/m/Y' ,strtotime($result[$j]['date']));
+                    $return['amount_breakup'][$x]['Type']= 'Adult '.$GSNvalue;
+                    $return['amount_breakup'][$x]['Board'] = $contractBoardCheck[0]['board'];
+                    $return['amount_breakup'][$x]['Price'] = $GAamount[$j-1]-($GAamount[$j-1]*$GDis)/100;
+                    $x++; 
+                  }
+                }
+              }
+            }
+            //General Supplement child breakup start -->
+            foreach ($general['date'] as $GCkey => $GCvalue) {
+              if ($GCvalue==date('d/m/Y' ,strtotime($result[$j]['date']))) {
+                foreach ($general['general'][$GCkey] as $GSNkey => $GSNvalue) {
+                  if (isset($general['RWchildAmount'][$GCkey]) && isset($general['RWchildAmount'][$GCkey][$GSNvalue][$i+1])) {
+                    $x++;
+                    $GSCmamount = 0;
+                    if ($revenue_markup['GeneralSupMarkup']!='') {
+                        $total_markup = $agent_markup;
+                      if ($revenue_markup['GeneralSupMarkuptype']=="Percentage") {
+                        $GSCmamount = ((array_sum($general['RWchildAmount'][$GCkey][$GSNvalue][$i+1])*$revenue_markup['GeneralSupMarkup'])/100);
+                      } else {
+                        $GSCmamount = $revenue_markup['GeneralSupMarkup'];
+                      }
+                    }
+                    $GCamount[$j-1] = (array_sum($general['RWchildAmount'][$GCkey][$GSNvalue][$i+1])*$total_markup)/100+array_sum($general['RWchildAmount'][$GCkey][$GSNvalue][$i+1])+$GSCmamount;
+                    $TGCamount[$j-1] = $GCamount[$j-1]-($GCamount[$j-1]*$GDis)/100;
+                    if ($RMdiscount['discount']!=0 && $RMdiscount['General']!=0) { 
+                      // $return['generalSupplement']['child'.$GCkey]['old-price'][]= $GCamount[$j-1];
+                    }
+                    $return['amount_breakup'][$x]['Date'] = date('d/m/Y' ,strtotime($result[$j]['date']));
+                    $return['amount_breakup'][$x]['Type'] = 'Child '.$GSNvalue;
+                    $return['amount_breakup'][$x]['Board'] = $contractBoardCheck[0]['board'];
+                    $return['amount_breakup'][$x]['Price'] = $GCamount[$j-1]-($GCamount[$j-1]*$GDis)/100;
+                    $x++;
+                  }
+                }
+              }
+            }
+          }
+
+          //Extra bed breakup start
+              if (isset($extrabed['date'][$j-1]) && isset($extrabed['RwextrabedAmount'][$j-1][$i])) {
+                foreach ($extrabed['RwextrabedAmount'][$j-1][$i] as $exMkey => $exMvalue) {
+                  $x++;
+                  $EXamount = 0;
+                  if ($extrabed['extrabedType'][$j-1][$i][$exMkey]=="Adult Extrabed" || $extrabed['extrabedType'][$j-1][$i][$exMkey]=="Child Extrabed") {
+                    if ($revenue_markup['ExtrabedMarkup']!='') {
+                          $total_markup = $agent_markup;
+                          if ($revenue_markup['ExtrabedMarkuptype']=="Percentage") {
+                          $EXamount = (($extrabed['RwextrabedAmount'][$j-1][$i][$exMkey]*$revenue_markup['ExtrabedMarkup'])/100);
+                        } else {
+                          $EXamount = $revenue_markup['ExtrabedMarkup'];
+                        }
+                      }
+                   } else {
+                    if ($revenue_markup['BoardSupMarkup']!='') {
+                      $total_markup = $agent_markup;
+                      if ($revenue_markup['BoardSupMarkuptype']=="Percentage") {
+                        $EXamount = (($extrabed['RwextrabedAmount'][$j-1][$i][$exMkey]*$revenue_markup['BoardSupMarkup'])/100);
+                      } else {
+                        $EXamount = $revenue_markup['BoardSupMarkup'];
+                      }
+                    }
+                  }                          
+                  $FextrabedAmount[$j-1] =  ($extrabed['RwextrabedAmount'][$j-1][$i][$exMkey]*$total_markup)/100+$extrabed['RwextrabedAmount'][$j-1][$i][$exMkey]+$EXamount;          
+                  $TFextrabedAmount[$j-1] += $FextrabedAmount[$j-1]-($FextrabedAmount[$j-1]*$exDis)/100; 
+                  if ($RMdiscount['discount']!=0 && $RMdiscount['Extrabed']!=0) {   
+                    // $return[$extrabed['extrabedType'][$j-1][$i][$exMkey]]['old-price'][] = $FextrabedAmount[$j-1];
+                  }
+
+                  $return['amount_breakup'][$x]['Date'] = date('d/m/Y' ,strtotime($result[$j]['date']));
+                  $return['amount_breakup'][$x]['Type'] = $extrabed['extrabedType'][$j-1][$i][$exMkey];
+                  $return['amount_breakup'][$x]['Board'] = $contractBoardCheck[0]['board'];
+                  $return['amount_breakup'][$x]['Price'] = $FextrabedAmount[$j-1]-($FextrabedAmount[$j-1]*$exDis)/100;
+
+                  $x++;
+                }
+              }
+              $x++;
+            }
+
+            $witotal[$i] = array_sum($WiDisroomAmount)+array_sum($TFextrabedAmount)+array_sum($BBAamount)+array_sum($BBCamount)+array_sum($LAamount)+array_sum($LCamount)+array_sum($DAamount)+array_sum($DCamount)+array_sum($TGAamount)+array_sum($TGCamount);  
+            $total[$i] = array_sum($DisroomAmount)+array_sum($TFextrabedAmount)+array_sum($BBAamount)+array_sum($BBCamount)+array_sum($LAamount)+array_sum($LCamount)+array_sum($DAamount)+array_sum($DCamount)+array_sum($TGAamount)+array_sum($TGCamount); 
+            if ($discountGet['dis']=="true") {
+              if ($discountGet['Extrabed']==1) {
+                array_splice($TFextrabedAmount,$Fdays);
+              }
+              if ($discountGet['General']==1) {
+                array_splice($TGAamount,$Fdays);
+                array_splice($TGCamount,$Fdays);
+              }
+              if ($discountGet['Board']==1) {
+                array_splice($BBAamount,$Fdays);
+                array_splice($BBCamount,$Fdays);
+
+                array_splice($LAamount,$Fdays);
+                array_splice($LCamount,$Fdays);
+
+                array_splice($DAamount,$Fdays);
+                array_splice($DCamount,$Fdays);
+              }
+            }
+
+            $totRmAmt[$i] = array_sum(array_splice($DisroomAmount, 1,$Fdays))+array_sum($TFextrabedAmount)+array_sum($BBAamount)+array_sum($BBCamount)+array_sum($LAamount)+array_sum($LCamount)+array_sum($DAamount)+array_sum($DCamount)+array_sum($TGAamount)+array_sum($TGCamount); 
+
+            unset($DisroomAmount);
+            unset($WiDisroomAmount);    
+
+            if ($discountGet['dis']=="true") {
+              $return['totalroomamount']['oldprice'] = $total[$i];
+              $return['totalroomamount']['price'] = $totRmAmt[$i];
+              $total[$i] = $totRmAmt[$i];
+            } else {
+               $return['totalroomamount']['price'] = $total[$i];  
+            }
+            if($return['amount_breakup']=="" || $return['totalroomamount']['price']==0) {
+              $response['result']['room'.($i+1)]['status'][] = 'Error'; 
+              $response['result']['room'.($i+1)]['status']['description'] = 'Invalid Room Combination'; 
+            } else {
+              $response['room'.($i+1)]['status'] = 'Success'; 
+              $response['room'.($i+1)] =$return; 
+            }
+            $return = array();
         }
+
+        $tax = $this->general_tax($data['hotelcode']);
+        $response['tax'] = $tax;
+        $finalAmount = array_sum($total);
+        $finalAmount = ($finalAmount*$tax)/100+$finalAmount;
+        $grandTotal = ($finalAmount*$tax)/100+$finalAmount;
+        $response['grandtotal'] = $grandTotal;
+
       return $response;
     }
     public function special_offer_amount($date,$room_id,$hotel_id,$contract_id) {
@@ -718,7 +953,7 @@ class QueryHandler {
     public function hotelbookingfun($data,$agent_id) {
       $return = array();
       $deposit = $this->agentdeposit($agent_id);
-      $review = $this->bookingreview($data);
+      $review = $this->bookingreview($data,$agent_id);
       // Get Max booking Id start 
       $max_id = $this->max_booking_id();
       // Get Max booking Id end 
@@ -737,11 +972,14 @@ class QueryHandler {
       $no_of_days=date_diff($checkin_date,$checkout_date);
       $tot_days = $no_of_days->format("%a");
       // Default variable declaration
-      $total =0;
+      
+      $total =$review['grandtotal'];
       for ($i=0; $i < $data['no_of_rooms'] ; $i++) { 
-        foreach ($review['room'.($i+1)] as $key => $value) {
-          $data['Room'.($i+1).'per_day_amount'][$key] = $value['amount'];
-          $total += $data['Room'.($i+1).'per_day_amount'][$key];
+        foreach ($review['room'.($i+1)]['amount_breakup'] as $key => $value) {
+          if (isset($value['RoomName'])) {
+            $data['Room'.($i+1).'per_day_amount'][$key] = $value['Price'];
+          }
+          // $total += $data['Room'.($i+1).'per_day_amount'][$key];
         }
       }
       if($deposit>=$total) {
