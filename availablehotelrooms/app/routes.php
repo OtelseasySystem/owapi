@@ -101,7 +101,10 @@ return function (App $app) {
             $tracking['Type'] = 'End';
             $trackingType = 'INFO';
             $data1 = array('status' => true, 'message' => 'Successfull');
+            $data1['token'] =  $data['token'];
             $data1['AvailableHotelRooms'] = $rooms;
+            $data1['RoomCombination'] = $rooms['RoomCombination'];
+            unset($data1['AvailableHotelRooms']['RoomCombination']);
           } else {
             $tracking['Type'] = 'EmptyData';
             $trackingType = 'INFO';

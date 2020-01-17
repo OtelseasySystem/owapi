@@ -427,7 +427,6 @@ class QueryHandler {
             $CachedString = $this->cache->getItem($key);
             $CachedString->set($AvailableRooms)->expiresAfter(18000);
             $this->cache->save($CachedString);
-            $return['token'] = $data['token'];
             $return['OptionsForBooking'] = $AvailableRooms['OptionsForBooking']['FixedFormat'];
             if (isset($AvailableRooms['HotelRooms']['HotelRoom'][0])) {
               $Rooms = $AvailableRooms['HotelRooms']['HotelRoom'];

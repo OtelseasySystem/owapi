@@ -1291,7 +1291,7 @@ class QueryHandler {
       $client = new SoapClient($query[0]['url']."?wsdl", ['exceptions' => true]);
       $this->result = $client->__doRequest($request, $location, $action, 2);
       $result = $this->result;
-      print_r(htmlentities($result));exit;
+      // print_r(htmlentities($result));exit;
     } catch (SoapFault $exception) {
        return true;
     }
