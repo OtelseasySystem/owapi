@@ -370,10 +370,9 @@ class QueryHandler {
             }
             $return = array();
         }
-
-        $tax = $this->general_tax($data['hotelcode']);
-        $response['tax'] = $tax;
         $finalAmount = array_sum($total);
+        $tax = $this->general_tax($data['hotelcode']);
+        $response['tax'] = ($finalAmount*$tax)/100;
         $finalAmount = ($finalAmount*$tax)/100+$finalAmount;
         $grandTotal = ($finalAmount*$tax)/100+$finalAmount;
         // $response['grandtotal'] = $grandTotal;
