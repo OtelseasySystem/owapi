@@ -983,7 +983,6 @@ class QueryHandler {
       $CachedString = $this->cache->getItem($key);
       $dd = $CachedString->get();
       $return = array();
-
       $checkin_date=date_create($data['check_in']);
       $checkout_date=date_create($data['check_out']);
       $no_of_days=date_diff($checkin_date,$checkout_date);
@@ -1060,6 +1059,7 @@ class QueryHandler {
           $tax = array();
           if (isset($PriceChanged['@attributes']['PriceChanged']) && $PriceChanged['@attributes']['PriceChanged']=="true") {
             foreach ($data['RoomIndex'] as $key => $value) {
+              $totalamt = 0;
               foreach ($PriceChanged['HotelRooms']['HotelRoom'] as $key1 => $value1) {
                 if ($value1['RoomIndex']==$value) {
 
@@ -1070,10 +1070,12 @@ class QueryHandler {
                       $DayRates = $value1['RoomRate']['DayRates']['DayRate']['@attributes']['BaseFare'];
                     }
                     $DayRates = ($DayRates*$total_markup)/100+$DayRates;
-                    $response['room'.($key+1)][$key]['amount_breakup'][$i]['Date'] = date('d/m/Y' ,strtotime($result[$i+1]['date'])); 
-                    $response['room'.($key+1)][$key]['amount_breakup'][$i]['RoomName'] = $value1['RoomTypeName']; 
-                    $response['room'.($key+1)][$key]['amount_breakup'][$i]['Board'] = $value1['MealType']=="" || is_array($value1['MealType']) ? 'Room Only' : $value1['MealType'];
-                    $response['room'.($key+1)][$key]['amount_breakup'][$i]['Price'] =  $this->xml_currency_change($DayRates,$value1['RoomRate']['@attributes']['Currency'],$agent_currency); 
+                    $response['room'.($key+1)]['amount_breakup'][$i]['Date'] = date('d/m/Y' ,strtotime($result[$i+1]['date'])); 
+                    $response['room'.($key+1)]['amount_breakup'][$i]['RoomName'] = $value1['RoomTypeName']; 
+                    $response['room'.($key+1)]['amount_breakup'][$i]['Board'] = $value1['MealType']=="" || is_array($value1['MealType']) ? 'Room Only' : $value1['MealType'];
+                    $response['room'.($key+1)]['amount_breakup'][$i]['Price'] =  $this->xml_currency_change($DayRates,$value1['RoomRate']['@attributes']['Currency'],$agent_currency); 
+                    $totalamt+=$response['room'.($key+1)]['amount_breakup'][$i]['Price'];
+                    $response['room'.($key+1)]['totalroomamount']['price'] = $totalamt;
 
                     // Cancellation policy
                       if(isset($cancelinfo) && count($cancelinfo)!=0) { 
@@ -1122,6 +1124,7 @@ class QueryHandler {
               $tax = array();
               $total = array();
               foreach ($data['RoomIndex'] as $key => $value) {
+                $totalamt = 0;
                 foreach ($dd['HotelRooms']['HotelRoom'] as $key1 => $value1) {
                   if ($value1['RoomIndex']==$value) {
                     for ($i=0; $i <$tot_days ; $i++) {
@@ -1131,10 +1134,12 @@ class QueryHandler {
                         $DayRates = $value1['RoomRate']['DayRates']['DayRate']['@attributes']['BaseFare'];
                       }
                       $DayRates = ($DayRates*$total_markup)/100+$DayRates;
-                      $response['room'.($key+1)][$key]['amount_breakup'][$i]['Date'] = date('d/m/Y' ,strtotime($result[$i+1]['date'])); 
-                      $response['room'.($key+1)][$key]['amount_breakup'][$i]['RoomName'] = $value1['RoomTypeName']; 
-                      $response['room'.($key+1)][$key]['amount_breakup'][$i]['Board'] = $value1['MealType']=="" || is_array($value1['MealType']) ? 'Room Only' : $value1['MealType'];
-                      $response['room'.($key+1)][$key]['amount_breakup'][$i]['Price'] =  $this->xml_currency_change($DayRates,$value1['RoomRate']['@attributes']['Currency'],$agent_currency); 
+                      $response['room'.($key+1)]['amount_breakup'][$i]['Date'] = date('d/m/Y' ,strtotime($result[$i+1]['date'])); 
+                      $response['room'.($key+1)]['amount_breakup'][$i]['RoomName'] = $value1['RoomTypeName']; 
+                      $response['room'.($key+1)]['amount_breakup'][$i]['Board'] = $value1['MealType']=="" || is_array($value1['MealType']) ? 'Room Only' : $value1['MealType'];
+                      $response['room'.($key+1)]['amount_breakup'][$i]['Price'] =  $this->xml_currency_change($DayRates,$value1['RoomRate']['@attributes']['Currency'],$agent_currency); 
+                      $totalamt+=$response['room'.($key+1)]['amount_breakup'][$i]['Price'];
+                      $response['room'.($key+1)]['totalroomamount']['price'] = $totalamt;
 
 
                       // Cancellation policy
