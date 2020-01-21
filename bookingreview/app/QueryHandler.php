@@ -1051,7 +1051,11 @@ class QueryHandler {
           } else {
             $response['Available'] = false;
           }
-          $response['remarks_and_policies'] = implode("<br>", $HotelNorms['HotelNorms']['string']);
+          if (is_array($HotelNorms['HotelNorms']['string'])) {
+            $response['remarks_and_policies'] = implode("<br>", $HotelNorms['HotelNorms']['string']);
+          } else {
+            $response['remarks_and_policies'] = $HotelNorms['HotelNorms']['string'];
+          }
           $total = array();
           $tax = array();
           if (isset($PriceChanged['@attributes']['PriceChanged']) && $PriceChanged['@attributes']['PriceChanged']=="true") {
