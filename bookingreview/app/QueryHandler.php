@@ -555,22 +555,22 @@ class QueryHandler {
         }
       }
 
-      $data[0]['RoomTypeName'] = $roomType[0]['Name'];
+      $data['RoomTypeName'] = $roomType[0]['Name'];
 
       if (count($refund)!=0) {
-        $data[0]['RoomTypeName'] = $roomType[0]['Name'];
-        $data[0]['FromDate'] = date("Y-m-d");
-        $data[0]['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
-        $data[0]['application'] = 'Stay';
-        $data[0]['ChargeType'] = "Percentage";
-        $data[0]['CancellationCharge'] = "100";
+        $data['RoomTypeName'] = $roomType[0]['Name'];
+        $data['FromDate'] = date("Y-m-d");
+        $data['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
+        $data['application'] = 'Stay';
+        $data['ChargeType'] = "Percentage";
+        $data['CancellationCharge'] = "100";
       } else if($disNRFVal!='') {
-        $data[0]['RoomTypeName'] = $roomType[0]['Name'];
-        $data[0]['FromDate'] = date("Y-m-d");
-        $data[0]['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
-        $data[0]['application'] = 'Stay';
-        $data[0]['ChargeType'] = "Percentage";
-        $data[0]['CancellationCharge'] = "100";
+        $data['RoomTypeName'] = $roomType[0]['Name'];
+        $data['FromDate'] = date("Y-m-d");
+        $data['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
+        $data['application'] = 'Stay';
+        $data['ChargeType'] = "Percentage";
+        $data['CancellationCharge'] = "100";
       } else {
         $data = array();
         $checkin_date=date_create($request['check_in']);
@@ -614,12 +614,12 @@ class QueryHandler {
           }
         }
         if (count($data)==0) {
-            $data[0]['RoomTypeName'] = $roomType[0]['Name'];
-            $data[0]['FromDate'] = date("Y-m-d");
-            $data[0]['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
-            $data[0]['application'] = 'Stay';
-            $data[0]['ChargeType'] = "Percentage";
-            $data[0]['CancellationCharge'] = "100";
+            $data['RoomTypeName'] = $roomType[0]['Name'];
+            $data['FromDate'] = date("Y-m-d");
+            $data['ToDate'] = date("Y-m-d" ,strtotime($request['check_in']));
+            $data['application'] = 'Stay';
+            $data['ChargeType'] = "Percentage";
+            $data['CancellationCharge'] = "100";
         }
       }
       return $data;
