@@ -1088,16 +1088,16 @@ class QueryHandler {
 
                           foreach ($cancelList as $key2 => $value2) {
                             if ($value==$value2['@attributes']['RoomIndex']) {
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['RoomTypeName'] = $value2['@attributes']['RoomTypeName']; 
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['FromDate'] =$value2['@attributes']['FromDate'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['ToDate'] =$value2['@attributes']['ToDate'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['ChargeType'] =$value2['@attributes']['ChargeType'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['CancellationCharge'] =$value2['@attributes']['CancellationCharge'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['Currency'] =$value2['@attributes']['Currency']; 
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['RoomTypeName'] = $value2['@attributes']['RoomTypeName']; 
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['FromDate'] =$value2['@attributes']['FromDate'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['ToDate'] =$value2['@attributes']['ToDate'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['ChargeType'] =$value2['@attributes']['ChargeType'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['CancellationCharge'] =$value2['@attributes']['CancellationCharge'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['Currency'] =$value2['@attributes']['Currency']; 
                               if ($value2['@attributes']['CancellationCharge']==0) {
-                                  $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['application'] = 'Free of charge';
+                                  $response['room'.($key+1)]['Cancellation_policy'][$key2]['application'] = 'Free of charge';
                               } else {
-                                  $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['application'] = 'Stay';
+                                  $response['room'.($key+1)]['Cancellation_policy'][$key2]['application'] = 'Stay';
                               } 
                             }
                           }
@@ -1153,16 +1153,16 @@ class QueryHandler {
 
                           foreach ($cancelList as $key2 => $value2) {
                             if ($value==$value2['@attributes']['RoomIndex']) {
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['RoomTypeName'] = $value2['@attributes']['RoomTypeName']; 
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['FromDate'] =$value2['@attributes']['FromDate'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['ToDate'] =$value2['@attributes']['ToDate'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['ChargeType'] =$value2['@attributes']['ChargeType'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['CancellationCharge'] =$value2['@attributes']['CancellationCharge'];  
-                              $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['Currency'] =$value2['@attributes']['Currency']; 
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['RoomTypeName'] = $value2['@attributes']['RoomTypeName']; 
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['FromDate'] =$value2['@attributes']['FromDate'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['ToDate'] =$value2['@attributes']['ToDate'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['ChargeType'] =$value2['@attributes']['ChargeType'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['CancellationCharge'] =$value2['@attributes']['CancellationCharge'];  
+                              $response['room'.($key+1)]['Cancellation_policy'][$key2]['Currency'] =$value2['@attributes']['Currency']; 
                               if ($value2['@attributes']['CancellationCharge']==0) {
-                                  $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['application'] = 'Free of charge';
+                                  $response['room'.($key+1)]['Cancellation_policy'][$key2]['application'] = 'Free of charge';
                               } else {
-                                  $response['room'.($key+1)]['Cancellation_policy'][$key][$key2]['application'] = 'Stay';
+                                  $response['room'.($key+1)]['Cancellation_policy'][$key2]['application'] = 'Stay';
                               } 
                             }
                           }
