@@ -572,7 +572,7 @@ class QueryHandler {
         $data['ChargeType'] = "Percentage";
         $data['CancellationCharge'] = "100";
       } else {
-        $data = array();
+        //$data = array();
         $checkin_date=date_create($request['check_in']);
         $checkout_date=date_create($request['check_out']);
         $no_of_days=date_diff($checkin_date,$checkout_date);
@@ -590,26 +590,26 @@ class QueryHandler {
           $CancellationPolicyCheck[$i] = $stmt2[$i]->fetchAll();
           if (count($CancellationPolicyCheck[$i])!=0) {
             foreach ($CancellationPolicyCheck[$i] as $key => $value) {
-              $data[$key]['RoomTypeName'] = $roomType[0]['Name'];
+              $data['RoomTypeName'] = $roomType[0]['Name'];
               $before = date('Y-m-d', strtotime('-'.$value['daysFrom'].' days', strtotime($request['check_in'])));
               $after = date('Y-m-d', strtotime('-'.$value['daysTo'].' days', strtotime($request['check_in'])));
               
               if ($before < date('Y-m-d')) {
-                $data[$key]['FromDate'] = date('d/m/Y');
+                $data['FromDate'] = date('d/m/Y');
               } else {
-                $data[$key]['FromDate'] = date('d/m/Y', strtotime('-'.$value['daysFrom'].' days', strtotime($request['check_in'])));
+                $data['FromDate'] = date('d/m/Y', strtotime('-'.$value['daysFrom'].' days', strtotime($request['check_in'])));
               }
 
               if ($after < date('Y-m-d')) {
-                $data[$key]['ToDate'] = date('d/m/Y');
+                $data['ToDate'] = date('d/m/Y');
               } else {
-                $data[$key]['ToDate'] = date('d/m/Y', strtotime('-'.$value['daysTo'].' days', strtotime($request['check_in'])));
+                $data['ToDate'] = date('d/m/Y', strtotime('-'.$value['daysTo'].' days', strtotime($request['check_in'])));
               }
               
               
-              $data[$key]['application'] = $value['application'];
-              $data[$key]['ChargeType'] = "Percentage";
-              $data[$key]['CancellationCharge'] = $value['cancellationPercentage'];
+              $data['application'] = $value['application'];
+              $data['ChargeType'] = "Percentage";
+              $data['CancellationCharge'] = $value['cancellationPercentage'];
             }
           }
         }
