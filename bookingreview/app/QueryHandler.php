@@ -360,7 +360,7 @@ class QueryHandler {
             } else {
                $return['totalroomamount']['price'] = $total[$i];  
             }
-            $return['Cancellation_policy'][$i] = $this->get_CancellationPolicy_table($data,$contractid[$i],$roomid[$i],$data['hotelcode']);
+            $return['Cancellation_policy'] = $this->get_CancellationPolicy_table($data,$contractid[$i],$roomid[$i],$data['hotelcode']);
             if($return['amount_breakup']=="" || $return['totalroomamount']['price']==0) {
               $response['result']['room'.($i+1)]['status'][] = 'Error'; 
               $response['result']['room'.($i+1)]['status']['description'] = 'Invalid Room Combination'; 
