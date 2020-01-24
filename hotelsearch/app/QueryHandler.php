@@ -830,7 +830,7 @@ class QueryHandler {
       $finarr = array_merge($arr,$data);
 
       $token = base64_encode(serialize($finarr));
-      $OtelseasyHotels =  $this->db->prepare("SELECT hotel_id as HotelCode,min(amount) as TotalPrice,h.hotel_name as HotelName,h.location as HotelAddress,concat('".$imgurl."uploads/gallery/',n.hotel_id,'/',h.Image1) as HotelPicture,h.hotel_description as HotelDescription, h.rating as Rating,'".$agent_currency."' as Currency,IF(IFNULL('',h.starsrating)='','',h.starsrating) as reviews ,'' as Inclusion ,'".$token."' as token  FROM (SELECT m.*,sum(dd) as amount ,count(*) as roomcount  FROM ( ".$room1.$room2.$room3.$room4.$room5.$room6.") m GROUP BY m.hotel_id HAVING roomcount >= ".count($data['adults']).") n INNER JOIN hotel_tbl_hotels h ON h.id = n.hotel_id GROUP BY n.hotel_id order by TotalPrice asc ,h.rating desc");
+      $OtelseasyHotels =  $this->db->prepare("SELECT hotel_id as HotelCode,min(amount) as TotalPrice,h.hotel_name as HotelName,h.location as HotelAddress,concat('".$imgurl."uploads/gallery/',n.hotel_id,'/',h.Image1) as HotelPicture,h.hotel_description as HotelDescription, h.rating as Rating,'".$agent_currency."' as Currency,IF(IFNULL('',h.starsrating)='','',h.starsrating) as reviews ,'' as Inclusion ,CONCAT(h.lattitude,'|',h.longitude) as mapdetails,'".$token."' as token  FROM (SELECT m.*,sum(dd) as amount ,count(*) as roomcount  FROM ( ".$room1.$room2.$room3.$room4.$room5.$room6.") m GROUP BY m.hotel_id HAVING roomcount >= ".count($data['adults']).") n INNER JOIN hotel_tbl_hotels h ON h.id = n.hotel_id GROUP BY n.hotel_id order by TotalPrice asc ,h.rating desc");
       $OtelseasyHotels->execute();
       $OEhotels =  $OtelseasyHotels->fetchAll();
 
@@ -1072,6 +1072,7 @@ class QueryHandler {
 
 
               $return[$key]['Inclusion'] = '';
+              $return[$key]['mapdetails'] =  $value['HotelInfo']['Latitude'].'|'.$value['HotelInfo']['Longitude'];
 
 
               $arr = array('Type' => '2','date' => date('Y-m-d H:i:s'),'sessionid'=>$Tbohotels['SessionId'], 'ResultIndex' => $value['ResultIndex']);

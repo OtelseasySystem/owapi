@@ -15,7 +15,7 @@ return function (App $app) {
   $container = $app->getContainer();
   
 
-	$app->post('/', function (Request $request, Response $response, array $args) {
+	$app->post('/v1', function (Request $request, Response $response, array $args) {
     	$input = $request->getAttribute('decoded_token_data');
     	$query = new QueryHandler($this->get('db'),$this->get('cache'));
       $contentType = $request->getHeaderLine('Content-Type');

@@ -14,7 +14,7 @@ return function (App $app) {
 
     $container = $app->getContainer();
 
-    $app->post('/', function (Request $request, Response $response, array $args) {
+    $app->post('/v1', function (Request $request, Response $response, array $args) {
     	$logger = $this->get('logwriter');
 		$query = new QueryHandler($this->get('db'));
 		$ip = $query->getRealIPAddr();

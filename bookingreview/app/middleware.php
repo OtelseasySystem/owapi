@@ -9,7 +9,7 @@ return function (App $app) {
     $app->add(SessionMiddleware::class);
 
     $app->add(new \Tuupola\Middleware\JwtAuthentication([
-	    "path" => "/", /* or ["/api", "/admin"] */
+	    "path" => "/v1", /* or ["/api", "/admin"] */
 	    "attribute" => "decoded_token_data",
 	    "relaxed" => ["test_webapi.bookingreview.otelseasy.com"],
 	    "secret" => "subinrabin",
