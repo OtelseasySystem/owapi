@@ -12,7 +12,8 @@ return function (App $app) {
     $app->add(new \Tuupola\Middleware\JwtAuthentication([
 	    "path" => "/auth", /* or ["/api", "/admin"] */
 	    "attribute" => "decoded_token_data",
-	    "relaxed" => ["test_webapi.otelseasy.com"],
+	    "relaxed" => ["test_webapi.otelseasy.com","headers"],
+	    "secure" => true,
 	    "secret" => $configs['secret'],
 	    "algorithm" => ["HS256"],
 	    "error" => function ($response, $arguments) {

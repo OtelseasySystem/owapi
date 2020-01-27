@@ -6,13 +6,15 @@ use Slim\App;
 // add(new \Slim\Csrf\Guard);
 
 return function (App $app) {
+	$configs = include('../config.php');
     $app->add(SessionMiddleware::class);
 
     $app->add(new \Tuupola\Middleware\JwtAuthentication([
 	    "path" => "/v1", /* or ["/api", "/admin"] */
 	    "attribute" => "decoded_token_data",
-	    "relaxed" => ["test_webapi.bookingdetails.otelseasy.com"],
-	    "secret" => "subinrabin",
+	    "relaxed" => ["test_webapi.bookingdetails.otelseasy.com","headers"],
+	    "secure" => true,
+	    "secret" => $configs['secret'],
 	    "algorithm" => ["HS256"],
 	    "error" => function ($response, $arguments) {
 	        $data["status"] = "error";

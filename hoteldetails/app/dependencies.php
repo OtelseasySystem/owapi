@@ -52,7 +52,7 @@ return function (ContainerBuilder $containerBuilder) {
 
             $settings = $c->get('settings');
             $loggerSettings = $settings['logger'];
-            $logger = new \Monolog\Logger('HOTELBOOK-API'); 
+            $logger = new \Monolog\Logger('HOTELDETAILS-API'); 
             $file_handler = new \Monolog\Handler\StreamHandler($configs['log']['path']);
             $logger->pushHandler($file_handler);
             return $logger;
