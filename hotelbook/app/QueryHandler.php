@@ -108,7 +108,7 @@ class QueryHandler {
               }
               if(!isset($data['RoomIndex'][$i]) || $data['RoomIndex'][$i] == '') {
                   $response['RoomIndex['.$i.']'] = 'RoomIndex '.($i).' is required';
-              } else {
+              } else if(!isset($data['sessionid'])) {
                   $roomindex = explode('-',$data['RoomIndex'][$i]);
                   if(!isset($roomindex[0]) || !isset($roomindex[1])) {
                     $response['RoomIndex['.$i.'] format'] = 'RoomIndex '.($i).' is should be in the contractId - roomId format(eg:CON010-348)';
