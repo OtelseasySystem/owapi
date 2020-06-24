@@ -23,6 +23,7 @@ $config['HotelBook-link'] = 'test_webapi.hotelbook.otelseasy.com';
 $config['BookingDetail-link'] = 'test_webapi.bookingdetails.otelseasy.com';
 $config['BookingCancel-link'] = 'test_webapi.bookingcancel.otelseasy.com';
 $config['CancelStatus-link'] = '"test_webapi.cancelstatus.otelseasy.com"';
+$config['ActivitySearch-link'] = 'test_webapi.activitysearch.otelseasy.com';
 
 
 
